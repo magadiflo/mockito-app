@@ -190,6 +190,19 @@ class ExamenServiceImplTest {
         assertEquals(1L, captor.getValue());
     }
 
+    @Test
+    void testDoThrow() {
+        Examen examen = Datos.EXAMEN;
+        examen.setPreguntas(Datos.PREGUNTAS);
+        //Usamos el doThrow al inicio cuando un método retorna void.
+        //Aquí le indicamos que lance la excepción cuando se invoque al método guardarVarias
+        Mockito.doThrow(IllegalArgumentException.class).when(this.preguntasRepository).guardarVarias(Mockito.anyList());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            this.examenService.guardar(examen);
+        });
+    }
+
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
         private Long argument;
 
