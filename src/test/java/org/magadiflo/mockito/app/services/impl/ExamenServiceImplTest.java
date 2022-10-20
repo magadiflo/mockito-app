@@ -12,7 +12,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -134,5 +133,20 @@ class ExamenServiceImplTest {
 
         Mockito.verify(this.examenRepository).guardar(Mockito.any(Examen.class));
         Mockito.verify(this.preguntasRepository).guardarVarias(Mockito.anyList());
+    }
+
+    @Test
+    void testManejoException() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES_ID_NULL);
+        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.isNull())).thenThrow(IllegalArgumentException.class);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+        });
+
+        assertEquals(IllegalArgumentException.class, exception.getClass());
+
+        Mockito.verify(this.examenRepository).findAll();
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.isNull());
     }
 }
