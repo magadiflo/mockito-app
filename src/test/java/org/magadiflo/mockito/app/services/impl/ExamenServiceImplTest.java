@@ -149,4 +149,20 @@ class ExamenServiceImplTest {
         Mockito.verify(this.examenRepository).findAll();
         Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.isNull());
     }
+
+    /***
+     * ArgumentMatchers, permite saber si coincide el valor real que se pasa como argumento en un método,
+     * y lo comparamos con los definidos en el Mock (when o verify), si coinciden pasa, sino falla.
+     * En otras palabras, se usa para asegurarse de que ciertos argumentos se pasen a los mock's
+     */
+    @Test
+    void testArgumentMatchers() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        Mockito.verify(this.examenRepository).findAll();
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.argThat(arg -> arg != null && arg >= 1L));
+    }
 }
