@@ -8,7 +8,9 @@ import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,9 +35,9 @@ class ExamenServiceImplTest {
 
     //@BeforeEach
     //void setUp() {
-        // FORMA 01 - Habilitar uso de anotaciones de Mockito para esta clase
-        // Esto nos permitirá trabajar con Inyección de Dependencias
-        //MockitoAnnotations.openMocks(this);
+    // FORMA 01 - Habilitar uso de anotaciones de Mockito para esta clase
+    // Esto nos permitirá trabajar con Inyección de Dependencias
+    //MockitoAnnotations.openMocks(this);
     //}
 
     @Test
@@ -89,11 +91,14 @@ class ExamenServiceImplTest {
 
     @Test
     void testNoExisteExamenVerify() {
+        //Given
         Mockito.when(this.examenRepository.findAll()).thenReturn(Collections.emptyList());
         Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
 
+        //When
         Examen examen = this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
 
+        //Then
         assertNull(examen);
         Mockito.verify(this.examenRepository).findAll();
         Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
@@ -101,14 +106,28 @@ class ExamenServiceImplTest {
 
     @Test
     void testGuardarExamen() {
+        //BDD (Bihavior, Driven, Development)
+
+        // Given (dado un entorno de prueba)
         Examen newExamen = Datos.EXAMEN;
         newExamen.setPreguntas(Datos.PREGUNTAS);
 
         //Simularemos, cuando se guarde cualquier examen, retorne una instancia de nuestra clase Datos
-        Mockito.when(this.examenRepository.guardar(Mockito.any(Examen.class))).thenReturn(Datos.EXAMEN);
+        Mockito.when(this.examenRepository.guardar(Mockito.any(Examen.class))).then(new Answer<Examen>() {
+            private Long secuencia = 7L;
 
+            @Override
+            public Examen answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Examen examen = invocationOnMock.getArgument(0); //Es el argumento que se le pasa en el método guardar(...)
+                examen.setId(this.secuencia++);
+                return examen;
+            }
+        });
+
+        // When (Cuando ejecutamos el método que queremos probar)
         Examen examen = this.examenService.guardar(newExamen);
 
+        // Then (entonces validamos)
         assertNotNull(examen.getId());
         assertEquals(7, examen.getId());
         assertEquals("Física", examen.getNombre());
