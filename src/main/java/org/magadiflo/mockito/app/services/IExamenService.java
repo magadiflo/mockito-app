@@ -10,4 +10,6 @@ public interface IExamenService {
 
     Examen findExamenByNombreWithPreguntas(String nombre);
 
+    Examen guardar(Examen examen);
+
 }

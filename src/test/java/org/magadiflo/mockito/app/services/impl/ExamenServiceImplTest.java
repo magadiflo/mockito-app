@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -96,5 +97,23 @@ class ExamenServiceImplTest {
         assertNull(examen);
         Mockito.verify(this.examenRepository).findAll();
         Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+    }
+
+    @Test
+    void testGuardarExamen() {
+        Examen newExamen = Datos.EXAMEN;
+        newExamen.setPreguntas(Datos.PREGUNTAS);
+
+        //Simularemos, cuando se guarde cualquier examen, retorne una instancia de nuestra clase Datos
+        Mockito.when(this.examenRepository.guardar(Mockito.any(Examen.class))).thenReturn(Datos.EXAMEN);
+
+        Examen examen = this.examenService.guardar(newExamen);
+
+        assertNotNull(examen.getId());
+        assertEquals(7, examen.getId());
+        assertEquals("Física", examen.getNombre());
+
+        Mockito.verify(this.examenRepository).guardar(Mockito.any(Examen.class));
+        Mockito.verify(this.preguntasRepository).guardarVarias(Mockito.anyList());
     }
 }

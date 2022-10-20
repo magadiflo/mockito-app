@@ -6,4 +6,6 @@ public interface IPreguntasRepository {
 
     List<String> findPreguntasByExamenId(Long id);
 
+    void guardarVarias(List<String> preguntas);
+
 }
