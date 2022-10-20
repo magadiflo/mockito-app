@@ -70,4 +70,32 @@ class ExamenServiceImplTest {
         assertEquals(6, examen.getPreguntas().size());
         assertTrue(examen.getPreguntas().contains("aritmética"));
     }
+
+    @Test
+    void testPreguntasExamenVerify() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        Examen examen = this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+        assertEquals(6, examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("aritmética"));
+
+        //Verificamos que del examenRepository se invoque el método findAll() que es el que precisamente Mockito simulará,
+        //ya que en esta prueba test, se necesita que eso pase. En caso nunca se llame al examenRepositorio.finAll(), el test no pasará.
+        //Lo mismo ocurre con el preguntasRepository.findPreguntasByExamenId(...), debemos verificar que se esté llamando
+        Mockito.verify(this.examenRepository).findAll();
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+    }
+
+    @Test
+    void testNoExisteExamenVerify() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Collections.emptyList());
+        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        Examen examen = this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        assertNull(examen);
+        Mockito.verify(this.examenRepository).findAll();
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+    }
 }
