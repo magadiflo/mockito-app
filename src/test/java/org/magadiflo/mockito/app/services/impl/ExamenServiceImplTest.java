@@ -203,6 +203,25 @@ class ExamenServiceImplTest {
         });
     }
 
+    @Test
+    void testDoAnswer() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+        //Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+        Mockito.doAnswer(invocation -> {
+           Long id = invocation.getArgument(0);
+           return id == 1L ? Datos.PREGUNTAS : Collections.emptyList();
+        }).when(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+
+        Examen examen = this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        assertEquals(6, examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("trigonometría"));
+        assertEquals(1L, examen.getId());
+        assertEquals("Matemáticas", examen.getNombre());
+
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+    }
+
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
         private Long argument;
 
