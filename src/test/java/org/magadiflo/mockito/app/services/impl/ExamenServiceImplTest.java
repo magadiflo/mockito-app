@@ -1,8 +1,10 @@
 package org.magadiflo.mockito.app.services.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.magadiflo.mockito.app.models.Examen;
 import org.magadiflo.mockito.app.repositories.IExamenRepository;
+import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
 import org.magadiflo.mockito.app.services.IExamenService;
 import org.mockito.Mockito;
 
@@ -15,8 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ExamenServiceImplTest {
 
-    @Test
-    void findExamenByNombre() {
+    IExamenRepository examenRepository;
+    IPreguntasRepository preguntasRepository;
+    IExamenService service;
+
+    @BeforeEach
+    void setUp() {
         /**
          * mock(...), dentro del método mock, agregamos la clase o interfaz que queremos simular.
          * En este caso, estamos colocando una interfaz, pero si colocamos una implementación real
@@ -27,9 +33,14 @@ class ExamenServiceImplTest {
          * por el que se defina con mockito, tal como se ve en esta línea de código:
          * Mockito.when(repository.findAll()).thenReturn(datos);
          */
-        IExamenRepository repository = Mockito.mock(IExamenRepository.class);
-        IExamenService service = new ExamenServiceImpl(repository);
+        this.examenRepository = Mockito.mock(IExamenRepository.class);
+        this.preguntasRepository = Mockito.mock(IPreguntasRepository.class);
 
+        this.service = new ExamenServiceImpl(examenRepository, preguntasRepository);
+    }
+
+    @Test
+    void findExamenByNombre() {
         List<Examen> datos = Arrays.asList(
                 new Examen(1L, "Matemáticas"),
                 new Examen(2L, "Lenguaje"),
@@ -40,9 +51,9 @@ class ExamenServiceImplTest {
         );
 
         // Cuando se llame al método findAll() de la interfaz IExamenRepository entonces que retorne esa lista de datos
-        Mockito.when(repository.findAll()).thenReturn(datos);
+        Mockito.when(this.examenRepository.findAll()).thenReturn(datos);
 
-        Optional<Examen> examenOptional = service.findExamenByNombre("Matemáticas");
+        Optional<Examen> examenOptional = this.service.findExamenByNombre("Matemáticas");
 
         assertTrue(examenOptional.isPresent());
         assertEquals(1L, examenOptional.orElseThrow().getId());
@@ -51,16 +62,11 @@ class ExamenServiceImplTest {
 
     @Test
     void findExamenByNombreListaVacia() {
-        IExamenRepository repository = Mockito.mock(IExamenRepository.class);
-        IExamenService service = new ExamenServiceImpl(repository);
-
         List<Examen> datos = Collections.emptyList();
-        Mockito.when(repository.findAll()).thenReturn(datos);
+        Mockito.when(this.examenRepository.findAll()).thenReturn(datos);
 
-        Optional<Examen> examenOptional = service.findExamenByNombre("Matemáticas");
+        Optional<Examen> examenOptional = this.service.findExamenByNombre("Matemáticas");
 
-        assertTrue(examenOptional.isPresent());
-        assertEquals(1L, examenOptional.orElseThrow().getId());
-        assertEquals("Matemáticas", examenOptional.orElseThrow().getNombre());
+        assertFalse(examenOptional.isPresent());
     }
 }
