@@ -8,7 +8,6 @@ import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
 import org.magadiflo.mockito.app.services.IExamenService;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +18,7 @@ class ExamenServiceImplTest {
 
     IExamenRepository examenRepository;
     IPreguntasRepository preguntasRepository;
-    IExamenService service;
+    IExamenService examenService;
 
     @BeforeEach
     void setUp() {
@@ -36,24 +35,15 @@ class ExamenServiceImplTest {
         this.examenRepository = Mockito.mock(IExamenRepository.class);
         this.preguntasRepository = Mockito.mock(IPreguntasRepository.class);
 
-        this.service = new ExamenServiceImpl(examenRepository, preguntasRepository);
+        this.examenService = new ExamenServiceImpl(examenRepository, preguntasRepository);
     }
 
     @Test
     void findExamenByNombre() {
-        List<Examen> datos = Arrays.asList(
-                new Examen(1L, "Matemáticas"),
-                new Examen(2L, "Lenguaje"),
-                new Examen(3L, "Historia"),
-                new Examen(4L, "Personal Social"),
-                new Examen(5L, "Ciencia y Ambiente"),
-                new Examen(6L, "Religión")
-        );
-
         // Cuando se llame al método findAll() de la interfaz IExamenRepository entonces que retorne esa lista de datos
-        Mockito.when(this.examenRepository.findAll()).thenReturn(datos);
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
 
-        Optional<Examen> examenOptional = this.service.findExamenByNombre("Matemáticas");
+        Optional<Examen> examenOptional = this.examenService.findExamenByNombre("Matemáticas");
 
         assertTrue(examenOptional.isPresent());
         assertEquals(1L, examenOptional.orElseThrow().getId());
@@ -65,8 +55,19 @@ class ExamenServiceImplTest {
         List<Examen> datos = Collections.emptyList();
         Mockito.when(this.examenRepository.findAll()).thenReturn(datos);
 
-        Optional<Examen> examenOptional = this.service.findExamenByNombre("Matemáticas");
+        Optional<Examen> examenOptional = this.examenService.findExamenByNombre("Matemáticas");
 
         assertFalse(examenOptional.isPresent());
+    }
+
+    @Test
+    void testPreguntasExamen() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+        //Mockito.anyLong(), será aplicado a cualquier valor del tipo long
+        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        Examen examen = this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+        assertEquals(6, examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("aritmética"));
     }
 }
