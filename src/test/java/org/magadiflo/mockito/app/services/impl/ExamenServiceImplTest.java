@@ -5,10 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.magadiflo.mockito.app.models.Examen;
 import org.magadiflo.mockito.app.repositories.IExamenRepository;
 import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
-import org.mockito.ArgumentMatcher;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -39,6 +36,9 @@ class ExamenServiceImplTest {
     // Esto nos permitirá trabajar con Inyección de Dependencias
     //MockitoAnnotations.openMocks(this);
     //}
+
+    @Captor
+    ArgumentCaptor<Long> captor;
 
     @Test
     void findExamenByNombre() {
@@ -178,8 +178,21 @@ class ExamenServiceImplTest {
         Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.argThat(new MiArgsMatchers()));
     }
 
+    @Test
+    void testArgumentCaptor() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+
+        this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        //ArgumentCaptor<Long> captor = ArgumentCaptor.forClass(Long.class); //Es lo mismo que la anotación realizada al inicio de esta clase
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(this.captor.capture());
+
+        assertEquals(1L, captor.getValue());
+    }
+
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
         private Long argument;
+
         @Override
         public boolean matches(Long aLong) {
             this.argument = aLong;
