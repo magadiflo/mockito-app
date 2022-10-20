@@ -1,4 +1,4 @@
-package org.magadiflo.mockito.app.services.impl;
+package org.magadiflo.mockito.app;
 
 import org.magadiflo.mockito.app.models.Examen;
 

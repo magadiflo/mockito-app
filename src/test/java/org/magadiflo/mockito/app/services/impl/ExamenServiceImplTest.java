@@ -2,9 +2,11 @@ package org.magadiflo.mockito.app.services.impl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.magadiflo.mockito.app.Datos;
 import org.magadiflo.mockito.app.models.Examen;
-import org.magadiflo.mockito.app.repositories.IExamenRepository;
+import org.magadiflo.mockito.app.repositories.impl.ExameRepositoryImpl;
 import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
+import org.magadiflo.mockito.app.repositories.impl.PreguntaRepositoryImpl;
 import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,10 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExamenServiceImplTest {
 
     @Mock
-    IExamenRepository examenRepository;
+    ExameRepositoryImpl examenRepository;
 
     @Mock
-    IPreguntasRepository preguntasRepository;
+    PreguntaRepositoryImpl preguntasRepository;
 
     // Necesariamente necesitamos una clase concreta (ExamenServiceImpl) para inyectar los repositorios,
     // ya que si establecemos aquí la interfaz genérica (IExamenService) mostrará error
@@ -220,6 +222,20 @@ class ExamenServiceImplTest {
         assertEquals("Matemáticas", examen.getNombre());
 
         Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+    }
+
+    @Test
+    void testDoCallRealMethod() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+//        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        //Invoca al método real
+        Mockito.doCallRealMethod().when(this.preguntasRepository).findPreguntasByExamenId(Mockito.anyLong());
+
+        Examen examen = this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        assertEquals(1L, examen.getId());
+        assertEquals("Matemáticas", examen.getNombre());
     }
 
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
