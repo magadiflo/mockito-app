@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.magadiflo.mockito.app.models.Examen;
 import org.magadiflo.mockito.app.repositories.IExamenRepository;
 import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -164,5 +165,34 @@ class ExamenServiceImplTest {
 
         Mockito.verify(this.examenRepository).findAll();
         Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.argThat(arg -> arg != null && arg >= 1L));
+    }
+
+    @Test
+    void testArgumentMatchers2() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES_ID_NEGATIVOS);
+        Mockito.when(this.preguntasRepository.findPreguntasByExamenId(Mockito.anyLong())).thenReturn(Datos.PREGUNTAS);
+
+        this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        Mockito.verify(this.examenRepository).findAll();
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(Mockito.argThat(new MiArgsMatchers()));
+    }
+
+    public static class MiArgsMatchers implements ArgumentMatcher<Long> {
+        private Long argument;
+        @Override
+        public boolean matches(Long aLong) {
+            this.argument = aLong;
+            return aLong != null && aLong > 0;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("MiArgsMatchers{");
+            sb.append("es para un mensaje personalizado de error que imprime mockito en caso de que falle el test. ");
+            sb.append(String.format("%d debe ser un entero positivo", this.argument));
+            sb.append('}');
+            return sb.toString();
+        }
     }
 }

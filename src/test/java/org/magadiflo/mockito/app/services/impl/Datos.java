@@ -15,6 +15,14 @@ public class Datos {
             new Examen(5L, "Ciencia y Ambiente"),
             new Examen(6L, "Religión")
     );
+    public static final List<Examen> EXAMENES_ID_NEGATIVOS = Arrays.asList(
+            new Examen(-1L, "Matemáticas"),
+            new Examen(-2L, "Lenguaje"),
+            new Examen(-3L, "Historia"),
+            new Examen(-4L, "Personal Social"),
+            new Examen(-5L, "Ciencia y Ambiente"),
+            new Examen(null, "Religión")
+    );
     public static final List<Examen> EXAMENES_ID_NULL = Arrays.asList(
             new Examen(null, "Matemáticas"),
             new Examen(null, "Lenguaje"),
