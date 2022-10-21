@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.magadiflo.mockito.app.Datos;
 import org.magadiflo.mockito.app.models.Examen;
+import org.magadiflo.mockito.app.repositories.IExamenRepository;
 import org.magadiflo.mockito.app.repositories.impl.ExameRepositoryImpl;
 import org.magadiflo.mockito.app.repositories.IPreguntasRepository;
 import org.magadiflo.mockito.app.repositories.impl.PreguntaRepositoryImpl;
+import org.magadiflo.mockito.app.services.IExamenService;
 import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -236,6 +238,22 @@ class ExamenServiceImplTest {
 
         assertEquals(1L, examen.getId());
         assertEquals("Matemáticas", examen.getNombre());
+    }
+
+    @Test
+    void testSpy() {
+        //Con spy, se hará siempre la llamada real (tener mucho cuidado)
+        IExamenRepository examenRepository = Mockito.spy(ExameRepositoryImpl.class);
+        IPreguntasRepository preguntasRepository = Mockito.spy(PreguntaRepositoryImpl.class);
+
+        IExamenService examenService = new ExamenServiceImpl(examenRepository, preguntasRepository);
+
+        Examen examen = examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        assertEquals(1L, examen.getId());
+        assertEquals("Matemáticas", examen.getNombre());
+        assertEquals(6, examen.getPreguntas().size());
+        assertTrue(examen.getPreguntas().contains("aritmética"));
     }
 
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
