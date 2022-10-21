@@ -286,6 +286,44 @@ class ExamenServiceImplTest {
         inOrder.verify(this.preguntasRepository).findPreguntasByExamenId(2L);//2° se invocará Lenguaje
     }
 
+    @Test
+    void testNumeroInvocaciones() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+
+        this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.times(1)).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atLeast(1)).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atLeastOnce()).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atMost(1)).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atMostOnce()).findPreguntasByExamenId(1L);
+    }
+
+    @Test
+    void testNumeroInvocaciones2() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Datos.EXAMENES);
+
+        this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+//        Mockito.verify(this.preguntasRepository).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.times(2)).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atLeast(2)).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atLeastOnce()).findPreguntasByExamenId(1L);
+        Mockito.verify(this.preguntasRepository, Mockito.atMost(2)).findPreguntasByExamenId(1L);
+//        Mockito.verify(this.preguntasRepository, Mockito.atMostOnce()).findPreguntasByExamenId(1L);
+    }
+
+    @Test
+    void testNumeroInvocaciones3() {
+        Mockito.when(this.examenRepository.findAll()).thenReturn(Collections.emptyList());
+
+        this.examenService.findExamenByNombreWithPreguntas("Matemáticas");
+
+        Mockito.verify(this.preguntasRepository, Mockito.never()).findPreguntasByExamenId(1L);
+        Mockito.verifyNoInteractions(this.preguntasRepository);
+    }
+
     public static class MiArgsMatchers implements ArgumentMatcher<Long> {
         private Long argument;
 
