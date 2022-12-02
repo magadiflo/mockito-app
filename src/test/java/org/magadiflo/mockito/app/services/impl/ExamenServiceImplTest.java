@@ -242,7 +242,20 @@ class ExamenServiceImplTest {
 
     @Test
     void testSpy() {
-        //Con spy, se hará siempre la llamada real (tener mucho cuidado)
+        /**
+         * Con spy, se hará siempre la llamada real (tener mucho cuidado).
+         *
+         * @Spy, Define un mock parcial, ya que podemos utilizar los métodos reales o
+         * simular el comportamiento de los métodos al igual que el Mock (Ver el README.md)
+         *
+         * Un Mock reemplaza por completo la clase base y solo devuelve valores por defecto
+         * o valores definidos por nosotros, mientras que un Spy mantendrá los objetos
+         * originales y solo reemplazará algunos métodos, a esto se le conoce como
+         * partial mocking.
+         *
+         * >>>>> Para mayor entendimiento y con ejemplo, revisar el README.md
+         */
+
         IExamenRepository examenRepository = Mockito.spy(ExameRepositoryImpl.class);
         IPreguntasRepository preguntasRepository = Mockito.spy(PreguntaRepositoryImpl.class);
 
