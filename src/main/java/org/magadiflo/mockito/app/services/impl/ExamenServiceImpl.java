@@ -31,6 +31,7 @@ public class ExamenServiceImpl implements IExamenService {
             examen = examenOptional.orElseThrow();
             List<String> preguntas = this.preguntasRepository.findPreguntasByExamenId(examen.getId());
 
+            // Duplicamos la llamada a este método para probar el número de invocaciones
             this.preguntasRepository.findPreguntasByExamenId(examen.getId());
 
             examen.setPreguntas(preguntas);
